@@ -1,0 +1,2 @@
+r - Restart - neu starten
+L - ausgeben des aktuellen Füllstandes in Liter
