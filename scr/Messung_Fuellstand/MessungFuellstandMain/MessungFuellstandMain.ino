@@ -29,6 +29,7 @@ NewPing sonars[SONAR_NUM] = {
 void setup() {
   Serial.begin(115200); // Open serial monitor at 115200 baud to see ping results.
   Serial.println("Messung des Füllstandes.\n\rVersion " + String(VERSION)+"."+SubVersion);
+  Serial.println("Für die Hilfe geben Sie \"h\" oder \"?\" ein.");
   inputString.reserve(200);
   stopMeasuring ? Serial.println("Messung angehalten") : Serial.println("Messung wird gestartet. Messintervall: " + String(UserConfig.measuringInterval) + " ms");
   Serial.println("Setup fertig gehe in Loop");
@@ -62,7 +63,34 @@ void serialEvent()
   {
     char inChar = (char)Serial.read();
     inputString += inChar;
+	if (inChr == '\r' || inChr == '\n') process_serial_input();
   }
 
   Serial.println(inputString);
+}
+
+void process_serial_input()
+{
+	//gib die Hilfe aus
+	if((inputString == "help") || (inputString == "hilfe") || (inputString == "h") || (inputString == "?")
+	{
+		Serial.println("Das wird mal die Hilfe");
+		return;
+	}
+	
+	if(inputString == "config")
+	{
+		void print_config();
+	}
+	
+	//Befehl zum neustarten des µC
+	if (inputString == "restart") {
+      avrSoftRestart();
+    }
+}
+
+void avrSoftRestart() {
+  Serial.println("Starte neu ...");
+  wdt_enable(WDTO_1S);
+  wdt_reset();
 }
