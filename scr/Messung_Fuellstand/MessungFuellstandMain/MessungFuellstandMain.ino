@@ -9,20 +9,20 @@
 #define ECHO_PIN     9  // Arduino pin tied to echo pin on the ultrasonic sensor.
 #define MAX_VOLUME 20 // Maximum bei 20cm zum Senor --> Voll
 #define MIN_VOLUME 120 // Minimum bei 120cm zum Senor --> leer 
-#define MAX_DISTANCE 200
+//#define MAX_DISTANCE 200
 #define SONAR_NUM 3 //Numbers of Sonar
 #define VERSION 1
 #define SubVersion 0
 
 
 String inputString;
-bool stopMeasuring=false;
+bool stopMeasuring=false; // Messung stoppen, wenn über Serial kommunizrt wird --> nach Reset false
 
 NewPing sonars[SONAR_NUM] = {
 
-  NewPing (TRIGGER_PIN_1, ECHO_PIN, MAX_DISTANCE),  // NewPing setup of pins and maximum distance.
-  NewPing (TRIGGER_PIN_2, ECHO_PIN, MAX_DISTANCE),  // NewPing setup of pins and maximum distance.
-  NewPing (TRIGGER_PIN_3, ECHO_PIN, MAX_DISTANCE)   // NewPing setup of pins and maximum distance.
+  NewPing (TRIGGER_PIN_1, ECHO_PIN, UserConfig.max_Distance),  // NewPing setup of pins and maximum distance.
+  NewPing (TRIGGER_PIN_2, ECHO_PIN, UserConfig.max_Distance),  // NewPing setup of pins and maximum distance.
+  NewPing (TRIGGER_PIN_3, ECHO_PIN, UserConfig.max_Distance)   // NewPing setup of pins and maximum distance.
 
 };
 
@@ -35,18 +35,25 @@ void setup() {
 }
 
 void loop() {
-  unsigned int uS = 0;
-  String ErgMessung="";
-  delay(50);                      // Wait 50ms between pings (about 20 pings/sec). 29ms should be the shortest delay between pings.
-  for(uint8_t i=0;i<SONAR_NUM;i++)
+  if(!stopMeasuring)
   {
-    ErgMessung += "S"+String(i+1)+":"+sonars[i].ping_cm()+";";
+    unsigned int uS = 0;
+    String ErgMessung="";
     delay(50);                      // Wait 50ms between pings (about 20 pings/sec). 29ms should be the shortest delay between pings.
-  }
+    for(uint8_t i=0;i<SONAR_NUM;i++)
+    {
+      ErgMessung += "S"+String(i+1)+":"+sonars[i].ping_cm()+";";
+      delay(50);                      // Wait 50ms between pings (about 20 pings/sec). 29ms should be the shortest delay between pings.
+    }
  
-  Serial.println(ErgMessung);
+    Serial.println(ErgMessung);
   
-  delay(UserConfig.measuringInterval);
+    delay(UserConfig.measuringInterval);
+  }
+  else
+  {
+    
+  }
 }
 
 void serialEvent()
